@@ -34,6 +34,13 @@ export class UserController {
     return this.userService.profile(req.user.userId);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/test')
+  @HttpCode(200)
+  test() {
+    return "hello world";
+  }
+
   @UseGuards(GoogleAuthGuard)
   @Get('/google/login')
   @HttpCode(200)
