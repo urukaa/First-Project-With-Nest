@@ -8,16 +8,10 @@ async function bootstrap() {
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   app.useLogger(logger);
 
-  const whitelist = ['https://yourdomain.com', 'https://admin.yourdomain.com'];
   app.enableCors({
-    origin: (origin, callback) => {
-     if (origin && whitelist.includes(origin)) {
-       callback(null, true);
-     } else {
-       callback(new Error('Not allowed by CORS'));
-     }
-    },
-    credentials: true,
+    origin: ['https://example.com'], // Izinkan hanya domain tertentu
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Izinkan cookies
   });
 
   await app.listen(process.env.PORT ?? 8000);
