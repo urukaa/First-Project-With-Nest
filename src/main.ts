@@ -11,11 +11,11 @@ async function bootstrap() {
   const whitelist = ['https://yourdomain.com', 'https://admin.yourdomain.com'];
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
+     if (origin && whitelist.includes(origin)) {
+       callback(null, true);
+     } else {
+       callback(new Error('Not allowed by CORS'));
+     }
     },
     credentials: true,
   });
