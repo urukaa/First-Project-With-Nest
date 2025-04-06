@@ -10,13 +10,13 @@ import { v4 as uuid } from 'uuid';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     @Inject(googleOauthConfig.KEY)
-    private googleConfiguration: ConfigType<typeof googleOauthConfig>,
+    googleConfiguration: ConfigType<typeof googleOauthConfig>,
     private userService: UserService,
   ) {
 
     console.log('GOOGLE_CLIENT_ID:', googleConfiguration.clientID);
     console.log(
-      'GOOGLE_CLIENT_SECRET:',
+      'GOOGLE_SECRET:',
       googleConfiguration.clientSecret,
     );
     console.log(
