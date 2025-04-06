@@ -37,7 +37,9 @@ export class UserController {
   @Get('/test')
   @HttpCode(200)
   test() {
-    return "hello world";
+    return{
+     data: "hello world"
+    }
   }
 
   @UseGuards(GoogleAuthGuard)
