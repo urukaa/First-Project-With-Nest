@@ -13,6 +13,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     private googleConfiguration: ConfigType<typeof googleOauthConfig>,
     private userService: UserService,
   ) {
+
+    console.log('GOOGLE_CLIENT_ID:', googleConfiguration.clientID);
+    console.log(
+      'GOOGLE_CLIENT_SECRET:',
+      googleConfiguration.clientSecret,
+    );
+    console.log(
+      'GOOGLE_CALLBACK_URL:',
+      googleConfiguration.callbackURL,
+    );
+
     super({
       clientID: googleConfiguration.clientID!,
       clientSecret: googleConfiguration.clientSecret!,
