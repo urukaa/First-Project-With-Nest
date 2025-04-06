@@ -19,6 +19,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       'GOOGLE_SECRET:',
       googleConfiguration.clientSecret,
     );
+    //  console.log(
+    //   'GOOGLE_SECRET:',
+    //   googleConfiguration.clientSecret,
+    // );
     console.log(
       'GOOGLE_CALLBACK_URL:',
       googleConfiguration.callbackURL,
