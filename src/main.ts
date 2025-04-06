@@ -9,11 +9,7 @@ async function bootstrap() {
   app.useLogger(logger);
 
   app.enableCors({
-    origin: [
-      'https://example.com',
-      'http://127.0.0.1:1000/*',
-      'http://127.0.0.1:1000',
-    ], // Izinkan hanya domain tertentu
+    origin: ['https://example.com'], // Izinkan hanya domain tertentu
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Izinkan cookies
   });
