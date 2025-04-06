@@ -8,6 +8,12 @@ async function bootstrap() {
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   app.useLogger(logger);
 
+  app.enableCors({
+    origin: ['https://example.com'], // Izinkan hanya domain tertentu
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true, // Izinkan cookies
+  });
+
   await app.listen(process.env.PORT ?? 8000);
 }
 bootstrap();
