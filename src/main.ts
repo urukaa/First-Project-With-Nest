@@ -8,11 +8,11 @@ async function bootstrap() {
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   app.useLogger(logger);
 
-  app.enableCors({
-    origin: ['https://example.com', 'http://127.0.0.1:1000/fetch-data'], // Izinkan hanya domain tertentu
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true, // Izinkan cookies
-  });
+  // app.enableCors({
+  //   origin: ['https://example.com', 'http://127.0.0.1:1000/fetch-data'], // Izinkan hanya domain tertentu
+  //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  //   credentials: true, // Izinkan cookies
+  // });
 
   await app.listen(process.env.PORT ?? 8000);
 }
