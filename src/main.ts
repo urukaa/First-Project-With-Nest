@@ -8,12 +8,11 @@ async function bootstrap() {
   const logger = app.get(WINSTON_MODULE_NEST_PROVIDER);
   app.useLogger(logger);
 
+  const rawOrigins = process.env.ORIGINS || '';
+  const allowedOrigins = rawOrigins ? rawOrigins.split(',').map((origin) => origin.trim()):['*'];
+
   app.enableCors({
-    origin: [
-      'https://example.com',
-      'http://127.0.0.1:1000',
-      'http://127.0.0.1:1000/*',
-    ], // Izinkan hanya domain tertentu
+    origin: allowedOrigins,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true, // Izinkan cookies
   });
