@@ -12,7 +12,7 @@ async function bootstrap() {
 
   // API DOCS WITH SWAGGER
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('My API')
+    .setTitle('MM TOPUP')
     .setDescription('The API description')
     .setVersion('1.0')
     .addBearerAuth() // jika pakai JWT
