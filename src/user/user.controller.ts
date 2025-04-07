@@ -4,13 +4,18 @@ import { WebResponse } from "src/model/web.model";
 import { LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { GoogleAuthGuard } from "src/auth/guards/google-auth/google-auth.guard";
+import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 
+@ApiTags('Users')
 @Controller('/api/auth')
 export class UserController {
   constructor(private userService: UserService) {}
 
   @Post('/register')
   @HttpCode(200)
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiBody({ type: RegisterUserReq })
+  @ApiResponse({ status: 200, description: 'User registered successfully' })
   async register(@Body() req: RegisterUserReq): Promise<{ message: string }> {
     const result = await this.userService.register(req);
     return {
@@ -20,6 +25,9 @@ export class UserController {
 
   @Post('/login')
   @HttpCode(200)
+  @ApiOperation({ summary: 'Login user' })
+  @ApiBody({ type: LoginUserReq })
+  @ApiResponse({ status: 200, type: WebResponse })
   async login(@Body() req: LoginUserReq): Promise<WebResponse<UserResponse>> {
     const result = await this.userService.login(req);
     return {
@@ -27,36 +35,35 @@ export class UserController {
     };
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get('/profile')
-  @HttpCode(200)
-  profile(@Req() req) {
-    return this.userService.profile(req.user.userId);
-  }
-
-  @Get('/test')
-  @HttpCode(200)
-  test() {
-    return{
-     data: "hello world"
-    }
-  }
-
   @UseGuards(GoogleAuthGuard)
   @Get('/google/login')
   @HttpCode(200)
+  @ApiOperation({ summary: 'Google OAuth Login (REDIRECT)' })
   googleLogin() {}
 
   @UseGuards(GoogleAuthGuard)
   @Get('/google/callback')
   @HttpCode(200)
+  @ApiOperation({ summary: 'Google OAuth Callback' })
+  @ApiExcludeEndpoint()
   async googleCallback(@Req() req, @Res() res) {
     const response = await this.userService.loginWithGoogle(req.user.username);
     res.redirect(`${process.env.CALLBACK_URL}${response.token}`);
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get user profile' })
+  profile(@Req() req) {
+    return this.userService.profile(req.user.userId);
+  }
+
   @Post('/logout')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Logout current user' })
   async logout(@Req() req) {
     const token = req.headers.authorization?.split(' ')[1];
     if (token) {
@@ -73,4 +80,14 @@ export class UserController {
   //     message: 'Update Success',
   //   };
   // }
+
+  @Get('/test')
+  @HttpCode(200)
+  @ApiExcludeEndpoint()
+  test() {
+    return {
+      data: 'uruka VO1D',
+    };
+  }
+  
 }
