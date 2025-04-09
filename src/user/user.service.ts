@@ -3,7 +3,7 @@ import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Logger } from "winston";
 import { PrismaService } from "src/common/prisma.service";
 import { ValidationService } from "src/common/validation.service";
-import { LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
+import { jwtPayload, LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
 import { UserValidation } from "./user.validation";
 import * as bcrypt from "bcrypt";
 import { User } from "@prisma/client";
@@ -90,6 +90,15 @@ export class UserService {
       return username;
   }
 
+  private generateJwtToken(user: User):string {
+    // Buat token JWT
+    const payload = { sub: user.id, username: user.username };
+    return this.jwtService.sign(payload, {
+      secret: this.configService.get<string>('jwt.secret'),
+      expiresIn: this.configService.get<string>('jwt.signOptions.expiresIn'),
+    });
+  }
+
   async login(req: LoginUserReq): Promise<UserResponse> {
     this.logger.debug(`Login Request ${JSON.stringify(req)}`);
 
@@ -108,12 +117,7 @@ export class UserService {
       throw new HttpException('Username or Password is Invalid!', 401);
     }
 
-    // Buat token JWT
-    const payload = { sub: user.id, username: user.username };
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: this.configService.get<string>('jwt.signOptions.expiresIn'),
-    });
+   const token = this.generateJwtToken(user);
 
     return {
       name: user.name,
@@ -132,12 +136,7 @@ export class UserService {
       throw new HttpException('Username or Password is Invalid!', 401);
     }
 
-    // Buat token JWT
-    const payload = { sub: user.id, username: user.username };
-    const token = this.jwtService.sign(payload, {
-      secret: this.configService.get<string>('jwt.secret'),
-      expiresIn: this.configService.get<string>('jwt.signOptions.expiresIn'),
-    });
+    const token = this.generateJwtToken(user);
 
     return {
       name: user.name,
@@ -171,40 +170,34 @@ export class UserService {
     });
   }
 
-  async update(user: User, req: UpdateUserReq): Promise<UserResponse> {
-    this.logger.info(`Update ${JSON.stringify(user)}`);
-
-    const updateReq: UpdateUserReq = this.validationService.validate(
-      UserValidation.UPDATE,
-      req,
-    );
-
-    if (updateReq.name) {
-      user.name = updateReq.name;
-    }
-
-    if (updateReq.phone) {
-      user.phone = updateReq.phone;
-    }
-
-    const result = await this.prismaService.user.update({
-      where: {
-        username: user.username,
-      },
-      data: user,
-    });
-
-    return {
-      name: result.name,
-      username: result.username,
-      phone: result.phone,
-    };
-  }
-
   async profile(userId: number) {
     return await this.prismaService.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, username: true },
+      select: { id: true, name: true, username: true, phone: true, email: true },
     });
+  }
+  
+  async update(user: jwtPayload, req: UpdateUserReq): Promise<UserResponse> {
+     this.logger.info(`Update userId=${user.userId}`);
+
+     const updateReq: UpdateUserReq = this.validationService.validate(
+       UserValidation.UPDATE,
+       req,
+     );
+
+     const data: Partial<User> = {};
+     if (updateReq.name) data.name = updateReq.name;
+     if (updateReq.phone) data.phone = updateReq.phone;
+
+     const result = await this.prismaService.user.update({
+       where: { id: user.userId, username: user.username },
+       data,
+     });
+
+     return {
+       name: result.name,
+       username: result.username,
+       phone: result.phone,
+     };
   }
 }

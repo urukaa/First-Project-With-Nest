@@ -9,6 +9,11 @@ export class UserResponse {
   token?: string;
 }
 
+export class jwtPayload {
+  userId: number;
+  username: string;
+}
+
 export class RegisterUserReq {
   @ApiProperty({ example: 'gento' })
   name: string;

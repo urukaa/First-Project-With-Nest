@@ -1,10 +1,11 @@
 import { Body, Controller, Get, HttpCode, Patch, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { WebResponse } from "src/model/web.model";
-import { LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
+import { jwtPayload, LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { GoogleAuthGuard } from "src/auth/guards/google-auth/google-auth.guard";
 import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import { CurrentUser } from "src/common/decorators/current-user.decorator";
 
 @ApiTags('Users')
 @Controller('/api/auth')
@@ -72,14 +73,17 @@ export class UserController {
     return { message: 'Logged out successfully' };
   }
 
-  // @Patch('/update')
-  // @HttpCode(200)
-  // async update(@BAuth() user: User, @Body() req: UpdateUserReq): Promise<{ message: string }> {
-  //   const result = await this.userService.update(user, req);
-  //   return {
-  //     message: 'Update Success',
-  //   };
-  // }
+  @Patch('/update')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'update current user' })
+  async update(@CurrentUser() user: jwtPayload, @Body() req: UpdateUserReq): Promise<{ message: string }> {
+    const result = await this.userService.update(user, req);
+    return {
+      message: 'Update Success',
+    };
+  }
 
   @Get('/test')
   @HttpCode(200)
