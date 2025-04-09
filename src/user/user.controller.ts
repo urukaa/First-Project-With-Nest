@@ -1,7 +1,7 @@
 import { Body, Controller, Get, HttpCode, Patch, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { WebResponse } from "src/model/web.model";
-import { jwtPayload, LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
+import { changePasswordReq, jwtPayload, LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { GoogleAuthGuard } from "src/auth/guards/google-auth/google-auth.guard";
 import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
@@ -78,10 +78,30 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'update current user' })
-  async update(@CurrentUser() user: jwtPayload, @Body() req: UpdateUserReq): Promise<{ message: string }> {
+  async update(
+    @CurrentUser() user: jwtPayload,
+    @Body() req: UpdateUserReq,
+  ): Promise<{ message: string }> {
     const result = await this.userService.update(user, req);
     return {
       message: 'Update Success',
+    };
+  }
+
+  @Patch('/change-password')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Change password current user' })
+  async changePassowrd(
+    @CurrentUser() user: jwtPayload,
+    @Body() req: changePasswordReq,
+    @Req() request, 
+  ): Promise<{ message: string }> {
+    const token = request.headers.authorization?.split(' ')[1];
+    const result = await this.userService.changePassowrd(user, req, token);
+    return {
+      message: 'Change Password Success',
     };
   }
 
@@ -93,5 +113,4 @@ export class UserController {
       data: 'uruka VO1D',
     };
   }
-  
 }

@@ -47,3 +47,11 @@ export class UpdateUserReq {
   phone?: string;
 }
 
+export class changePasswordReq {
+  @ApiPropertyOptional({ example: '' })
+  oldPassword: string;
+
+  @ApiPropertyOptional({ example: '' })
+  newPassword: string;
+}
+

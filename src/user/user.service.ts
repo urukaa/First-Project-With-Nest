@@ -3,7 +3,7 @@ import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import { Logger } from "winston";
 import { PrismaService } from "src/common/prisma.service";
 import { ValidationService } from "src/common/validation.service";
-import { jwtPayload, LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
+import { changePasswordReq, jwtPayload, LoginUserReq, RegisterUserReq, UpdateUserReq, UserResponse } from "src/model/user.model";
 import { UserValidation } from "./user.validation";
 import * as bcrypt from "bcrypt";
 import { User } from "@prisma/client";
@@ -200,4 +200,37 @@ export class UserService {
        phone: result.phone,
      };
   }
+
+  async changePassowrd(currentUser: jwtPayload, req: changePasswordReq, token){
+    this.logger.info(`Update userId=${currentUser.userId}`);
+
+    const changePassReq: changePasswordReq = this.validationService.validate(
+      UserValidation.CHANGEPASSWORD,
+      req,
+    );
+
+    const user = await this.prismaService.user.findUnique({
+      where: { id: currentUser.userId, username: currentUser.username },
+    });
+    
+     if (!user) {
+       throw new HttpException('User not found', 404);
+     }
+    // Cek old password
+    const isPasswordValid = await bcrypt.compare(changePassReq.oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new HttpException('Old Password is Invalid!', 401);
+    }
+
+    const hashedPassword = await bcrypt.hash(changePassReq.newPassword, 10);
+
+    await this.prismaService.user.update({
+      where: { id: currentUser.userId, username: currentUser.username },
+      data:  {password: hashedPassword},
+    });
+
+    await this.logout(token);
+    
+  }
+
 }
