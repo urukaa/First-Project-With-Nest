@@ -5,7 +5,6 @@ export class UserResponse {
   name: string;
   username: string;
   email?: string;
-  phone?: string;
   token?: string;
 }
 
@@ -20,9 +19,6 @@ export class RegisterUserReq {
 
   @ApiProperty({ example: 'gento@gmail.com' })
   email: string;
-
-  @ApiProperty({ example: '08123456789' })
-  phone: string;
 
   @ApiProperty({ example: 'gento' })
   username: string;
@@ -42,9 +38,6 @@ export class LoginUserReq {
 export class UpdateUserReq {
   @ApiPropertyOptional({ example: 'gentoled' })
   name?: string;
-
-  @ApiPropertyOptional({ example: '0899999999' })
-  phone?: string;
 }
 
 export class changePasswordReq {

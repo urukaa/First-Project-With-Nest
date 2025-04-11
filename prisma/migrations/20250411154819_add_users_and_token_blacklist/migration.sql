@@ -3,10 +3,9 @@ CREATE TABLE `User` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
-    `phone` VARCHAR(20) NOT NULL,
     `username` VARCHAR(100) NOT NULL,
     `password` VARCHAR(100) NOT NULL,
-    `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER',
+    `role` ENUM('USER', 'ADMIN', 'TALENT', 'RESELLER') NOT NULL DEFAULT 'USER',
 
     UNIQUE INDEX `User_email_key`(`email`),
     UNIQUE INDEX `User_username_key`(`username`),

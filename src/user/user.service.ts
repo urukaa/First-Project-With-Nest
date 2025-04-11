@@ -173,7 +173,7 @@ export class UserService {
   async profile(userId: number) {
     return await this.prismaService.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, username: true, phone: true, email: true },
+      select: { id: true, name: true, username: true, email: true },
     });
   }
   
@@ -187,7 +187,6 @@ export class UserService {
 
      const data: Partial<User> = {};
      if (updateReq.name) data.name = updateReq.name;
-     if (updateReq.phone) data.phone = updateReq.phone;
 
      const result = await this.prismaService.user.update({
        where: { id: user.userId, username: user.username },
@@ -197,7 +196,6 @@ export class UserService {
      return {
        name: result.name,
        username: result.username,
-       phone: result.phone,
      };
   }
 

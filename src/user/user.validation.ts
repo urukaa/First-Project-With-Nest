@@ -6,8 +6,6 @@ export class UserValidation {
 
     email: z.string().email().min(1).max(100),
 
-    phone: z.string().min(1).max(20),
-
     username: z.string().min(1).max(100),
 
     password: z.string().min(5).max(100),
@@ -20,7 +18,6 @@ export class UserValidation {
 
   static readonly UPDATE: ZodType = z.object({
     name: z.string().min(1).max(100).optional(),
-    phone: z.string().min(1).max(20).optional(),
   });
 
   static readonly CHANGEPASSWORD: ZodType = z.object({

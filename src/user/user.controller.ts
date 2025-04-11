@@ -14,6 +14,7 @@ export class UserController {
 
   @Post('/register')
   @HttpCode(200)
+  @ApiExcludeEndpoint() // to hidden
   @ApiOperation({ summary: 'Register new user' })
   @ApiBody({ type: RegisterUserReq })
   @ApiResponse({ status: 200, description: 'User registered successfully' })
@@ -26,6 +27,7 @@ export class UserController {
 
   @Post('/login')
   @HttpCode(200)
+  @ApiExcludeEndpoint() // to hidden
   @ApiOperation({ summary: 'Login user' })
   @ApiBody({ type: LoginUserReq })
   @ApiResponse({ status: 200, type: WebResponse })
@@ -90,13 +92,14 @@ export class UserController {
 
   @Patch('/change-password')
   @HttpCode(200)
+  @ApiExcludeEndpoint() // to hidden
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change password current user' })
   async changePassowrd(
     @CurrentUser() user: jwtPayload,
     @Body() req: changePasswordReq,
-    @Req() request, 
+    @Req() request,
   ): Promise<{ message: string }> {
     const token = request.headers.authorization?.split(' ')[1];
     const result = await this.userService.changePassowrd(user, req, token);
