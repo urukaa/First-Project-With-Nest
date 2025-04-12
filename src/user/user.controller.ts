@@ -6,6 +6,7 @@ import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { GoogleAuthGuard } from "src/auth/guards/google-auth/google-auth.guard";
 import { ApiBearerAuth, ApiBody, ApiExcludeEndpoint, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
+import { User } from "@prisma/client";
 
 @ApiTags('Users')
 @Controller('/api/auth')
@@ -60,7 +61,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get user profile' })
   profile(@Req() req) {
-    return this.userService.profile(req.user.userId);
+    return this.userService.profile(req.user.id);
   }
 
   @Post('/logout')
@@ -81,7 +82,7 @@ export class UserController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'update current user' })
   async update(
-    @CurrentUser() user: jwtPayload,
+    @CurrentUser() user: User,
     @Body() req: UpdateUserReq,
   ): Promise<{ message: string }> {
     const result = await this.userService.update(user, req);

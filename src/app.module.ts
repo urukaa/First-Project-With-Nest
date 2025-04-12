@@ -4,6 +4,7 @@ import { UserModule } from './user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import googleOauthConfig from './auth/config/google-oauth.config';
 import jwtConfig from './auth/config/jwt.config';
+import { ResellerModule } from './reseller/reseller.module';
 
 
 @Module({
@@ -14,6 +15,7 @@ import jwtConfig from './auth/config/jwt.config';
     }),
     CommonModule,
     UserModule,
+    ResellerModule,
   ],
   controllers: [],
   providers: [],

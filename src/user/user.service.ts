@@ -92,7 +92,7 @@ export class UserService {
 
   private generateJwtToken(user: User):string {
     // Buat token JWT
-    const payload = { sub: user.id, username: user.username };
+    const payload = { sub: user.id, username: user.username, email:user.email, role:user.role, name:user.name };
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('jwt.secret'),
       expiresIn: this.configService.get<string>('jwt.signOptions.expiresIn'),
@@ -173,24 +173,23 @@ export class UserService {
   async profile(userId: number) {
     return await this.prismaService.user.findUnique({
       where: { id: userId },
-      select: { id: true, name: true, username: true, email: true },
+      select: { id: true, name: true, username: true, email: true, role: true },
     });
   }
   
-  async update(user: jwtPayload, req: UpdateUserReq): Promise<UserResponse> {
-     this.logger.info(`Update userId=${user.userId}`);
+  async update(user: User, req: UpdateUserReq): Promise<UserResponse> {
+     this.logger.info(`Update userId=${user.id}`);
 
      const updateReq: UpdateUserReq = this.validationService.validate(
        UserValidation.UPDATE,
        req,
      );
 
-     const data: Partial<User> = {};
-     if (updateReq.name) data.name = updateReq.name;
+     if (updateReq.name) user.name = updateReq.name;
 
      const result = await this.prismaService.user.update({
-       where: { id: user.userId, username: user.username },
-       data,
+       where: { id: user.id, username: user.username },
+       data: user,
      });
 
      return {
