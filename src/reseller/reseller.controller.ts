@@ -8,14 +8,12 @@ import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles/roles.guard";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { WebResponse } from "src/model/web.model";
-import { R2Service } from "src/common/r2.service";
 
 @ApiTags('Registration Reseller')
 @Controller('/api/register-reseller')
 export class ResellerController {
   constructor(
     private resellerSerivce: ResellerService,
-    private readonly r2Service: R2Service,
   ) {}
 
   @Get()
