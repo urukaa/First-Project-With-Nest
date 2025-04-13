@@ -1,18 +1,22 @@
-import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Patch, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, Param, ParseIntPipe, Patch, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ResellerService } from "./reseller.service";
 import { RegisterResellerReq, ResellerResponse, VerificationResellerReq } from "src/model/reseller.model";
 import { CurrentUser } from "src/common/decorators/current-user.decorator";
-import { Reseller, User } from "@prisma/client";
+import { User } from "@prisma/client";
 import { JwtAuthGuard } from "src/auth/guards/jwt-auth/jwt-auth.guard";
 import { RolesGuard } from "src/auth/guards/roles/roles.guard";
 import { Roles } from "src/common/decorators/roles.decorator";
 import { WebResponse } from "src/model/web.model";
+import { R2Service } from "src/common/r2.service";
 
 @ApiTags('Registration Reseller')
-@Controller('/register-reseller')
+@Controller('/api/register-reseller')
 export class ResellerController {
-  constructor(private resellerSerivce: ResellerService) {}
+  constructor(
+    private resellerSerivce: ResellerService,
+    private readonly r2Service: R2Service,
+  ) {}
 
   @Get()
   @HttpCode(200)
@@ -60,7 +64,7 @@ export class ResellerController {
   async listSubmission(): Promise<WebResponse<ResellerResponse[]>> {
     const result = await this.resellerSerivce.waitingList();
     return {
-        data: result
+      data: result,
     };
   }
 

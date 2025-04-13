@@ -5,13 +5,14 @@ import { ConfigModule } from '@nestjs/config';
 import googleOauthConfig from './auth/config/google-oauth.config';
 import jwtConfig from './auth/config/jwt.config';
 import { ResellerModule } from './reseller/reseller.module';
+import r2Config from './r2/r2.config';
 
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true, // Penting supaya config bisa diakses dari mana saja
-      load: [googleOauthConfig, jwtConfig], // Semua config dimuat di sini
+      load: [googleOauthConfig, jwtConfig, r2Config], // Semua config dimuat di sini
     }),
     CommonModule,
     UserModule,

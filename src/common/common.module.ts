@@ -8,6 +8,8 @@ import { APP_FILTER } from '@nestjs/core';
 import { ErrorFilter } from './error.filter';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TokenCleanupSerivce } from 'src/cronjob/token-cleanup.service';
+import r2Config from 'src/r2/r2.config';
+import { R2Service } from './r2.service';
 
 @Global()
 @Module({
@@ -22,8 +24,9 @@ import { TokenCleanupSerivce } from 'src/cronjob/token-cleanup.service';
             isGlobal: true
         }),
          ScheduleModule.forRoot(),
+        ConfigModule.forFeature(r2Config)
     ],
-    providers: [PrismaService, ValidationService, {provide: APP_FILTER, useClass:ErrorFilter}, TokenCleanupSerivce],
-    exports : [PrismaService, ValidationService]
+    providers: [PrismaService, ValidationService, {provide: APP_FILTER, useClass:ErrorFilter}, TokenCleanupSerivce, R2Service],
+    exports : [PrismaService, ValidationService, R2Service]
 })
 export class CommonModule {}
