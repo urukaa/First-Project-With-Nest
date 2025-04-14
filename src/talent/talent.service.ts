@@ -180,6 +180,7 @@ toTalentResponse(talent: Talent) : TalentResponse{
         ...req,
         ...uploaded,
         user_id: user.id,
+        status: StatusRegistration.PENDING,
       },
     });
 
@@ -237,5 +238,4 @@ toTalentResponse(talent: Talent) : TalentResponse{
   
       return this.toTalentResponse(talent);
     }
-
 }
