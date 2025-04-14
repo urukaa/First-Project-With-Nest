@@ -160,13 +160,13 @@ toTalentResponse(talent: Talent) : TalentResponse{
       const uploaded = {};
     for (const [key, value] of Object.entries(files)) {
       if (value && value[0]) {
-        // 🔥 Hapus media lama kalau ada
+        // Hapus media lama kalau ada
         const oldUrl = existingSubmission[key]; // ambil dari data lama
         if (oldUrl) {
           await this.r2Service.deleteFile(oldUrl); // pastikan method ini ada di r2Service
         }
 
-        // 🚀 Upload media baru
+        // Upload media baru
         const { url } = await this.r2Service.uploadFile(value[0]);
         uploaded[key] = url;
       }
