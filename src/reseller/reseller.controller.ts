@@ -13,7 +13,7 @@ import { WebResponse } from "src/model/web.model";
 @Controller('/api/register-reseller')
 export class ResellerController {
   constructor(
-    private resellerSerivce: ResellerService,
+    private resellerService: ResellerService,
   ) {}
 
   @Get()
@@ -21,7 +21,7 @@ export class ResellerController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   async checkStatus(@CurrentUser() user: User) {
-    return this.resellerSerivce.checkStatus(user);
+    return this.resellerService.checkStatus(user);
   }
 
   @Post('/submission')
@@ -33,7 +33,7 @@ export class ResellerController {
     @CurrentUser() user: User,
     @Body() req: RegisterResellerReq,
   ): Promise<{ message: string }> {
-    await this.resellerSerivce.RegisterReseller(user, req);
+    await this.resellerService.RegisterReseller(user, req);
     return {
       message: 'Register Reseller Success!',
     };
@@ -48,7 +48,7 @@ export class ResellerController {
     @CurrentUser() user: User,
     @Body() req: RegisterResellerReq,
   ): Promise<{ message: string }> {
-    await this.resellerSerivce.UpdateRegisterReseller(user, req);
+    await this.resellerService.UpdateRegisterReseller(user, req);
     return {
       message: 'Update Submission Register Reseller Success!',
     };
@@ -60,7 +60,7 @@ export class ResellerController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   async listSubmission(): Promise<WebResponse<ResellerResponse[]>> {
-    const result = await this.resellerSerivce.waitingList();
+    const result = await this.resellerService.waitingList();
     return {
       data: result,
     };
@@ -75,7 +75,7 @@ export class ResellerController {
     @Param('resellerId', ParseIntPipe) resellerId: number,
     @Body() req: VerificationResellerReq,
   ): Promise<{ message: string }> {
-    await this.resellerSerivce.VerificationReseller(req);
+    await this.resellerService.VerificationReseller(req);
     return {
       message: 'Verification Reseller Success!',
     };

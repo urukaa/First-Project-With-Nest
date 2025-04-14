@@ -27,7 +27,7 @@ CREATE TABLE `Talent` (
     `photo_idcard` VARCHAR(255) NOT NULL,
     `app_profile_screenshot` VARCHAR(255) NOT NULL,
     `introduction_video` VARCHAR(255) NOT NULL,
-    `photo_display` VARCHAR(255) NOT NULL,
+    `photo_display` VARCHAR(255) NULL,
     `status` ENUM('PENDING', 'ACCEPT', 'DECLINE') NOT NULL DEFAULT 'PENDING',
     `user_id` INTEGER NOT NULL,
     `live_platform_id` INTEGER NOT NULL,

@@ -3,6 +3,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Inject } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import r2Config from 'src/r2/r2.config';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class R2Service {
@@ -32,7 +33,7 @@ export class R2Service {
   }
 
   async uploadFile(file: Express.Multer.File) {
-    const key = `${Date.now()}-${file.originalname}`;
+    const key = `talent/${uuidv4()}-${Date.now()}-${file.originalname}`;
 
     await this.s3.send(
       new PutObjectCommand({

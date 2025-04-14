@@ -6,6 +6,7 @@ import googleOauthConfig from './auth/config/google-oauth.config';
 import jwtConfig from './auth/config/jwt.config';
 import { ResellerModule } from './reseller/reseller.module';
 import r2Config from './r2/r2.config';
+import { talentModule } from './talent/talent.module';
 
 
 @Module({
@@ -17,6 +18,7 @@ import r2Config from './r2/r2.config';
     CommonModule,
     UserModule,
     ResellerModule,
+    talentModule,
   ],
   controllers: [],
   providers: [],

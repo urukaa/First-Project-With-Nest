@@ -86,7 +86,7 @@ model Talent {
   photo_idcard              String    @db.VarChar(255)
   app_profile_screenshot    String    @db.VarChar(255)
   introduction_video        String    @db.VarChar(255)
-  photo_display             String    @db.VarChar(255)
+  photo_display             String?    @db.VarChar(255)
   status       StatusRegistration     @default(PENDING)
   user_id                 Int         @unique
   live_platform_id        Int
