@@ -12,13 +12,12 @@ import { WebResponse } from "src/model/web.model";
 @ApiTags('Registration Reseller')
 @Controller('/api/register-reseller')
 export class ResellerController {
-  constructor(
-    private resellerService: ResellerService,
-  ) {}
+  constructor(private resellerService: ResellerService) {}
 
   @Get()
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('USER')
   @ApiBearerAuth()
   async checkStatus(@CurrentUser() user: User) {
     return this.resellerService.checkStatus(user);

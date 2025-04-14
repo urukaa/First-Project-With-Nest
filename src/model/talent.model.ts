@@ -1,4 +1,5 @@
-import { Sexs } from '@prisma/client';
+import { ApiProperty } from '@nestjs/swagger';
+import { Sexs, StatusRegistration } from '@prisma/client';
 
 export class TalentResponse {
   id?: number;
@@ -60,4 +61,12 @@ export class UpdateRegisterTalentReq {
   app_profile_screenshot?: string;
   introduction_video?: string;
   live_platform_id?: number;
+}
+
+export class VerificationTalentReq {
+  id: number;
+  
+  @ApiProperty({ example: 'ACCEPT' })
+  status: StatusRegistration;
+
 }

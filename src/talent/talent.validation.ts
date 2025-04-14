@@ -53,4 +53,8 @@ export class TalentValidation {
       .preprocess((val) => Number(val), z.number().int())
       .optional(),
   });
+
+  static readonly UPDATESTATUS: ZodType = z.object({
+    status: z.string(),
+  });
 }

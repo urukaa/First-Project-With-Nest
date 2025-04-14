@@ -1,11 +1,11 @@
 // src/talent/talent.service.ts
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { StatusRegistration, Talent, User } from '@prisma/client';
+import { Role, StatusRegistration, Talent, User } from '@prisma/client';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { R2Service } from 'src/common/r2.service';
 import { ValidationService } from 'src/common/validation.service';
-import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq } from 'src/model/talent.model';
+import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq, VerificationTalentReq } from 'src/model/talent.model';
 import { Logger } from 'winston';
 import { TalentValidation } from './talent.validation';
 
@@ -185,4 +185,57 @@ toTalentResponse(talent: Talent) : TalentResponse{
 
     return this.toTalentResponse(talent);
   }
+
+  async waitingList(): Promise<TalentResponse[]> {
+        const talents = await this.prismaService.talent.findMany({include:{user:true}});
+        this.logger.debug(`Waiting List talent ${JSON.stringify(talents)}`);
+  
+      return talents.map((talent) => this.toTalentResponse(talent))
+    }
+  
+    async VerificationTalent(
+      req: VerificationTalentReq,
+    ): Promise<TalentResponse> {
+      this.logger.info(`Update Register Talent ${JSON.stringify(req)}`);
+  
+      const VerificationTalentRequest: VerificationTalentReq =
+        this.validationService.validate(TalentValidation.UPDATESTATUS, req);
+  
+      const talent = await this.prismaService.talent.findFirst({
+        where: { id: VerificationTalentRequest.id },
+        include: { user: true },
+      });
+  
+      if (!talent) {
+        throw new HttpException('data not found!', 400);
+      }
+  
+      if (talent.status === StatusRegistration.ACCEPT) {
+          await this.prismaService.user.update({
+            where: { id: talent.user_id },
+            data: {
+              role: Role.USER,
+            },
+          });
+      }
+  
+      await this.prismaService.talent.update({
+        where: { id: talent.id },
+        data: {
+          status: VerificationTalentRequest.status,
+        },
+      });
+  
+      if (VerificationTalentRequest.status === StatusRegistration.ACCEPT) {
+        await this.prismaService.user.update({
+          where: { id: talent.user_id },
+          data: {
+            role: Role.TALENT,
+          },
+        });
+      }
+  
+      return this.toTalentResponse(talent);
+    }
+
 }

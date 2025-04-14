@@ -1,13 +1,14 @@
-import { Controller, Post, Body, UploadedFiles, UseInterceptors, UseGuards, HttpCode, Get, Patch } from '@nestjs/common';
+import { Controller, Post, Body, UploadedFiles, UseInterceptors, UseGuards, HttpCode, Get, Patch, Param, ParseIntPipe } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { TalentService } from './talent.service';
-import { RegisterTalentReq, UpdateRegisterTalentReq } from 'src/model/talent.model';
+import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq, VerificationTalentReq } from 'src/model/talent.model';
 import { User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { WebResponse } from 'src/model/web.model';
 
 @ApiTags('Registration Talent')
 @Controller('/api/register-talent')
@@ -16,7 +17,8 @@ export class TalentController {
 
   @Get()
   @HttpCode(200)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('USER')
   @ApiBearerAuth()
   async checkStatus(@CurrentUser() user: User) {
     return this.talentService.checkStatus(user);
@@ -80,6 +82,33 @@ export class TalentController {
     await this.talentService.UpdateRegisterTalent(user, req, files);
     return {
       message: 'Update Submission Register Talent Success!',
+    };
+  }
+
+  @Get('/submission/list')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  async listSubmission(): Promise<WebResponse<TalentResponse[]>> {
+    const result = await this.talentService.waitingList();
+    return {
+      data: result,
+    };
+  }
+
+  @Patch('/submission/verification/:talentId')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('ADMIN')
+  @ApiBearerAuth()
+  async verificationSubmission(
+    @Param('talentId', ParseIntPipe) talentId: number,
+    @Body() req: VerificationTalentReq,
+  ): Promise<{ message: string }> {
+    await this.talentService.VerificationTalent(req);
+    return {
+      message: 'Verification talent Success!',
     };
   }
 }
