@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Inject } from '@nestjs/common';
 import { ConfigType } from '@nestjs/config';
 import r2Config from 'src/r2/r2.config';
@@ -45,8 +45,23 @@ export class R2Service {
     );
 
     return {
-        url: `${this.config.url}/${key}`,
+      url: `${this.config.url}/${key}`,
       key,
     };
+  }
+
+  async deleteFile(fileUrl: string): Promise<void> {
+    const key = this.extractKeyFromUrl(fileUrl); // contoh: "talent/uuid.jpg"
+    await this.s3.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      }),
+    );
+  }
+
+  private extractKeyFromUrl(fileUrl: string): string {
+    const url = new URL(fileUrl);
+    return decodeURIComponent(url.pathname.substring(1)); // remove leading '/'
   }
 }

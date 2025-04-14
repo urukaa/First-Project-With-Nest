@@ -1,11 +1,11 @@
 // src/talent/talent.service.ts
 import { HttpException, Inject, Injectable } from '@nestjs/common';
-import { Talent, User } from '@prisma/client';
+import { StatusRegistration, Talent, User } from '@prisma/client';
 import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { R2Service } from 'src/common/r2.service';
 import { ValidationService } from 'src/common/validation.service';
-import { RegisterTalentReq, TalentResponse } from 'src/model/talent.model';
+import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq } from 'src/model/talent.model';
 import { Logger } from 'winston';
 import { TalentValidation } from './talent.validation';
 
@@ -70,9 +70,7 @@ toTalentResponse(talent: Talent) : TalentResponse{
     },
   ) {
 
-    this.logger.info(
-      `Register Talent ${JSON.stringify(req)}`,
-    );
+    this.logger.info(`Register Talent ${JSON.stringify(req)}`);
     
     const RegisterTalentRequest: RegisterTalentReq =
         this.validationService.validate(TalentValidation.REGISTER, req);
@@ -115,5 +113,76 @@ toTalentResponse(talent: Talent) : TalentResponse{
       message: 'Talent registered successfully',
       data: newTalent,
     };
+  }
+
+  async UpdateRegisterTalent(
+      user: User,
+      req: UpdateRegisterTalentReq,
+      files: {
+      photo_closeup?: Express.Multer.File[];
+      photo_fullbody?: Express.Multer.File[];
+      photo_idcard?: Express.Multer.File[];
+      app_profile_screenshot?: Express.Multer.File[];
+      introduction_video?: Express.Multer.File[];
+    },): Promise<TalentResponse> {
+      this.logger.info(`Update Register Talent ${JSON.stringify(req)}`);
+  
+      const UpdateRegisterTalentRequest: UpdateRegisterTalentReq = this.validationService.validate(TalentValidation.UPDATE, req);
+  
+      const existingSubmission = await this.prismaService.talent.findFirst({
+        where: { user_id: user.id },
+      });
+  
+      if (!existingSubmission) {
+        throw new HttpException('register required', 400);
+      }
+
+      if (existingSubmission.user_id !== user.id) {
+        throw new HttpException('Forbidden', 403);
+      }
+
+     if (typeof req.birth_date === 'string') {
+       req.birth_date = new Date(req.birth_date);
+     }
+
+     if (req.live_platform_id) {
+      const existingLivePlatform =
+        await this.prismaService.livePlatform.findUnique({
+          where: { id: UpdateRegisterTalentRequest.live_platform_id },
+        });
+
+      if (!existingLivePlatform) {
+        throw new HttpException('Live Platform not Found', 400);
+      }
+       req.live_platform_id = Number(req.live_platform_id);
+     }
+  
+      const uploaded = {};
+    for (const [key, value] of Object.entries(files)) {
+      if (value && value[0]) {
+        // 🔥 Hapus media lama kalau ada
+        const oldUrl = existingSubmission[key]; // ambil dari data lama
+        if (oldUrl) {
+          await this.r2Service.deleteFile(oldUrl); // pastikan method ini ada di r2Service
+        }
+
+        // 🚀 Upload media baru
+        const { url } = await this.r2Service.uploadFile(value[0]);
+        uploaded[key] = url;
+      }
+    }
+
+    const talent = await this.prismaService.talent.update({
+      where: {
+        user_id: existingSubmission.user_id,
+      },
+      data: {
+        ...req,
+        ...uploaded,
+        user_id: user.id,
+      },
+    });
+
+    return this.toTalentResponse(talent);
   }
 }

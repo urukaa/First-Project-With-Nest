@@ -1,7 +1,7 @@
-import { Controller, Post, Body, UploadedFiles, UseInterceptors, UseGuards, HttpCode, Get } from '@nestjs/common';
+import { Controller, Post, Body, UploadedFiles, UseInterceptors, UseGuards, HttpCode, Get, Patch } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { TalentService } from './talent.service';
-import { RegisterTalentReq } from 'src/model/talent.model';
+import { RegisterTalentReq, UpdateRegisterTalentReq } from 'src/model/talent.model';
 import { User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
@@ -15,11 +15,11 @@ export class TalentController {
   constructor(private readonly talentService: TalentService) {}
 
   @Get()
-    @HttpCode(200)
-    @UseGuards(JwtAuthGuard)
-    @ApiBearerAuth()
-    async checkStatus(@CurrentUser() user: User) {
-      return this.talentService.checkStatus(user);
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  async checkStatus(@CurrentUser() user: User) {
+    return this.talentService.checkStatus(user);
   }
 
   @Post('/submission')
@@ -48,7 +48,38 @@ export class TalentController {
       introduction_video?: Express.Multer.File[];
     },
   ) {
-
     return this.talentService.registerTalent(user, req, files);
+  }
+
+  @Patch('/submission/update')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('USER')
+  @ApiBearerAuth()
+  @UseInterceptors(
+    FileFieldsInterceptor([
+      { name: 'photo_closeup', maxCount: 1 },
+      { name: 'photo_fullbody', maxCount: 1 },
+      { name: 'photo_idcard', maxCount: 1 },
+      { name: 'app_profile_screenshot', maxCount: 1 },
+      { name: 'introduction_video', maxCount: 1 },
+    ]),
+  )
+  async updateSubmission(
+    @CurrentUser() user: User,
+    @Body() req: UpdateRegisterTalentReq,
+    @UploadedFiles()
+    files: {
+      photo_closeup?: Express.Multer.File[];
+      photo_fullbody?: Express.Multer.File[];
+      photo_idcard?: Express.Multer.File[];
+      app_profile_screenshot?: Express.Multer.File[];
+      introduction_video?: Express.Multer.File[];
+    },
+  ): Promise<{ message: string }> {
+    await this.talentService.UpdateRegisterTalent(user, req, files);
+    return {
+      message: 'Update Submission Register Talent Success!',
+    };
   }
 }

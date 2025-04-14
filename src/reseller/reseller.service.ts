@@ -87,8 +87,8 @@ export class ResellerService {
       throw new HttpException('register required', 400);
     }
 
-    if (existingSubmission?.status === StatusRegistration.PENDING) {
-      throw new HttpException('SABAR LAH TUNGGU ADMIN ACC', 400);
+    if (existingSubmission.user_id !== user.id) {
+      throw new HttpException('Forbidden', 403);
     }
 
     const reseller = await this.prismaService.reseller.update({
