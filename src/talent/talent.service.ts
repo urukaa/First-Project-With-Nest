@@ -188,8 +188,16 @@ toTalentResponse(talent: Talent) : TalentResponse{
     return this.toTalentResponse(talent);
   }
 
-  async waitingList(): Promise<TalentResponse[]> {
-        const talents = await this.prismaService.talent.findMany({include:{user:true}});
+  async waitingList(status?: StatusRegistration): Promise<TalentResponse[]> {
+        let talents = await this.prismaService.talent.findMany({include:{user:true}});
+
+        if (status) {
+          talents = await this.prismaService.talent.findMany({
+            where: {status: status},
+            include: { user: true },
+          });
+        }
+
         this.logger.debug(`Waiting List talent ${JSON.stringify(talents)}`);
   
       return talents.map((talent) => this.toTalentResponse(talent))
@@ -209,7 +217,7 @@ toTalentResponse(talent: Talent) : TalentResponse{
       if (!talent) {
         throw new HttpException('data not found!', 400);
       }
-      
+
       const VerificationTalentRequest: VerificationTalentReq =
         this.validationService.validate(TalentValidation.UPDATESTATUS, req);
   

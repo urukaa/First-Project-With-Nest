@@ -1,13 +1,13 @@
-import { Controller, Post, Body, UploadedFiles, UseInterceptors, UseGuards, HttpCode, Get, Patch, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Post, Body, UploadedFiles, UseInterceptors, UseGuards, HttpCode, Get, Patch, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { TalentService } from './talent.service';
 import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq, VerificationTalentReq } from 'src/model/talent.model';
-import { User } from '@prisma/client';
+import { StatusRegistration, User } from '@prisma/client';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { WebResponse } from 'src/model/web.model';
 
 @ApiTags('Registration Talent')
@@ -18,7 +18,7 @@ export class TalentController {
   @Get()
   @HttpCode(200)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('USER','TALENT')
+  @Roles('USER', 'TALENT')
   @ApiBearerAuth()
   async checkStatus(@CurrentUser() user: User) {
     return this.talentService.checkStatus(user);
@@ -90,8 +90,16 @@ export class TalentController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @ApiBearerAuth()
-  async listSubmission(): Promise<WebResponse<TalentResponse[]>> {
-    const result = await this.talentService.waitingList();
+  @ApiQuery({
+    name: 'status',
+    enum: StatusRegistration,
+    required: false, // ← agar tidak wajib di Swagger
+    description: 'Filter berdasarkan status pendaftaran',
+  })
+  async listSubmission(
+    @Query('status') status?: StatusRegistration,
+  ): Promise<WebResponse<TalentResponse[]>> {
+    const result = await this.talentService.waitingList(status);
     return {
       data: result,
     };
