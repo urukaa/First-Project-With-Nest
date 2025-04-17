@@ -5,7 +5,7 @@ import { WINSTON_MODULE_PROVIDER } from 'nest-winston';
 import { PrismaService } from 'src/common/prisma.service';
 import { R2Service } from 'src/common/r2.service';
 import { ValidationService } from 'src/common/validation.service';
-import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq, UploadPhotoDisplayReq, VerificationTalentReq } from 'src/model/talent.model';
+import { RegisterTalentReq, TalentResponse, UpdateRegisterTalentReq, VerificationTalentReq } from 'src/model/talent.model';
 import { Logger } from 'winston';
 import { TalentValidation } from './talent.validation';
 
