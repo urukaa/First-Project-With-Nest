@@ -6,4 +6,4 @@ import { TalentController } from "./talent.controller";
     providers:[TalentService],
     controllers:[TalentController]
 })
-export class talentModule{}
+export class TalentModule{}

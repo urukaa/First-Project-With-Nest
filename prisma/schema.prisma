@@ -61,7 +61,7 @@ model Reseller {
 
 model LivePlatform{
   id                Int      @id @default(autoincrement())
-  name              String   @db.VarChar(50)
+  name              String   @db.VarChar(50) @unique
   coin_type         String   @db.VarChar(20)
   price_per_coin    Int
 
