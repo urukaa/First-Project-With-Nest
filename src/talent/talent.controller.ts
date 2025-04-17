@@ -18,7 +18,7 @@ export class TalentController {
   @Get()
   @HttpCode(200)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('USER')
+  @Roles('USER','TALENT')
   @ApiBearerAuth()
   async checkStatus(@CurrentUser() user: User) {
     return this.talentService.checkStatus(user);
@@ -106,7 +106,7 @@ export class TalentController {
     @Param('talentId', ParseIntPipe) talentId: number,
     @Body() req: VerificationTalentReq,
   ): Promise<{ message: string }> {
-    await this.talentService.VerificationTalent(req);
+    await this.talentService.VerificationTalent(req, talentId);
     return {
       message: 'Verification talent Success!',
     };

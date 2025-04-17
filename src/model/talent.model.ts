@@ -19,6 +19,7 @@ export class TalentResponse {
   photo_idcard: string;
   app_profile_screenshot: string;
   introduction_video: string;
+  photo_display: string | null;
   livePlatformId: number;
   status: string;
 }
@@ -64,9 +65,6 @@ export class UpdateRegisterTalentReq {
 }
 
 export class VerificationTalentReq {
-  id: number;
-  
   @ApiProperty({ example: 'ACCEPT' })
   status: StatusRegistration;
-
 }

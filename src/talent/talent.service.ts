@@ -20,25 +20,26 @@ export class TalentService {
 
 toTalentResponse(talent: Talent) : TalentResponse{
       return {
-          id: talent.id,
-          name: talent.name,
-          sexs: talent.sexs,
-          streaming_id: talent.streaming_id,
-          birth_date: talent.birth_date,
-          phone: talent.phone,
-          tiktok_username: talent.tiktok_username,
-          instagram_username: talent.instagram_username,
-          host_location: talent.host_location,
-          smartphone_used: talent.smartphone_used,
-          referred_by: talent.referred_by,
-          has_live_experience: talent.has_live_experience,
-          photo_closeup: talent.photo_closeup,
-          photo_fullbody: talent.photo_fullbody,
-          photo_idcard: talent.photo_idcard,
-          app_profile_screenshot: talent.app_profile_screenshot,
-          introduction_video: talent.introduction_video,
-          livePlatformId: talent.live_platform_id,
-          status: talent.status,
+        id: talent.id,
+        name: talent.name,
+        sexs: talent.sexs,
+        streaming_id: talent.streaming_id,
+        birth_date: talent.birth_date,
+        phone: talent.phone,
+        tiktok_username: talent.tiktok_username,
+        instagram_username: talent.instagram_username,
+        host_location: talent.host_location,
+        smartphone_used: talent.smartphone_used,
+        referred_by: talent.referred_by,
+        has_live_experience: talent.has_live_experience,
+        photo_closeup: talent.photo_closeup,
+        photo_fullbody: talent.photo_fullbody,
+        photo_idcard: talent.photo_idcard,
+        app_profile_screenshot: talent.app_profile_screenshot,
+        introduction_video: talent.introduction_video,
+        photo_display: talent.photo_display,
+        livePlatformId: talent.live_platform_id,
+        status: talent.status,
       };
     }
 
@@ -196,20 +197,21 @@ toTalentResponse(talent: Talent) : TalentResponse{
   
     async VerificationTalent(
       req: VerificationTalentReq,
+      talentId: number,
     ): Promise<TalentResponse> {
       this.logger.info(`Update Register Talent ${JSON.stringify(req)}`);
   
-      const VerificationTalentRequest: VerificationTalentReq =
-        this.validationService.validate(TalentValidation.UPDATESTATUS, req);
-  
       const talent = await this.prismaService.talent.findFirst({
-        where: { id: VerificationTalentRequest.id },
+        where: { id: talentId },
         include: { user: true },
       });
   
       if (!talent) {
         throw new HttpException('data not found!', 400);
       }
+      
+      const VerificationTalentRequest: VerificationTalentReq =
+        this.validationService.validate(TalentValidation.UPDATESTATUS, req);
   
       if (talent.status === StatusRegistration.ACCEPT) {
           await this.prismaService.user.update({
