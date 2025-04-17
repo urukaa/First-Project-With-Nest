@@ -68,3 +68,12 @@ export class VerificationTalentReq {
   @ApiProperty({ example: 'ACCEPT' })
   status: StatusRegistration;
 }
+
+export class UploadPhotoDisplayReq {
+  @ApiProperty({
+    type: 'string',
+    format: 'binary',
+    required: true,
+  })
+  photo_display: string;
+}
