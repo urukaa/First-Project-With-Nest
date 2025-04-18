@@ -38,6 +38,10 @@ export class TalentController {
       { name: 'introduction_video', maxCount: 1 },
     ]),
   )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: RegisterTalentReq,
+  })
   async registerTalent(
     @CurrentUser() user: User,
     @Body() req: RegisterTalentReq,
@@ -67,6 +71,10 @@ export class TalentController {
       { name: 'introduction_video', maxCount: 1 },
     ]),
   )
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: UpdateRegisterTalentReq,
+  })
   async updateSubmission(
     @CurrentUser() user: User,
     @Body() req: UpdateRegisterTalentReq,
@@ -126,9 +134,7 @@ export class TalentController {
   @Roles('ADMIN')
   @ApiBearerAuth()
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'photo_display', maxCount: 1 },
-    ]),
+    FileFieldsInterceptor([{ name: 'photo_display', maxCount: 1 }]),
   )
   @ApiConsumes('multipart/form-data')
   @ApiBody({
